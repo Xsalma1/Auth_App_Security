@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Shield | Authentication System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="glass-card p-8 rounded-3xl shadow-2xl w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-indigo-500 tracking-tight">Secure Shield</h1>
+            <p class="text-gray-400 mt-2 text-sm">Data Integrity & Authentication System</p>
+        </div>
+
+        <div class="flex bg-slate-800 p-1 rounded-xl mb-6">
+            <button id="loginTab" class="flex-1 py-2 rounded-lg font-semibold text-white bg-indigo-600 transition">Login</button>
+            <button id="registerTab" class="flex-1 py-2 rounded-lg font-semibold text-gray-400 hover:text-white transition">Register</button>
+        </div>
+
+        <form id="registerForm" class="hidden space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase ml-1 mb-1">Full Name</label>
+                <input type="text" id="regName" required class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase ml-1 mb-1">Email</label>
+                <input type="email" id="regEmail" required class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase ml-1 mb-1">Password</label>
+                <input type="password" id="regPass" required class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase ml-1 mb-1">System Role</label>
+                <select id="regRole" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="User">Standard User</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Admin">Administrator</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg transition duration-300">Create Account</button>
+        </form>
+
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase ml-1 mb-1">Email Address</label>
+                <input type="email" id="loginEmail" required class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase ml-1 mb-1">Password</label>
+                <input type="password" id="loginPass" required class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg transition duration-300">Verify Credentials</button>
+        </form>
+
+        <div id="tfaSection" class="hidden space-y-6 text-center animate-pulse">
+            <div class="py-4">
+                <div class="text-indigo-400 font-bold text-lg mb-2">Two-Factor Authentication</div>
+                <p class="text-gray-400 text-xs">Enter the 6-digit code from your Authenticator App</p>
+            </div>
+            <input type="text" id="tfaCode" maxlength="6" placeholder="000 000" class="w-full p-4 text-center text-3xl tracking-[1rem] font-mono rounded-xl bg-slate-900 border-2 border-indigo-500 text-white outline-none">
+            <button id="verify2faBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg transition">Complete Login</button>
+        </div>
+
+        <div id="qrContainer" class="hidden mt-8 p-6 bg-white rounded-2xl text-center shadow-inner">
+            <p class="text-slate-900 text-sm font-bold mb-4">Scan this with Google Authenticator</p>
+            <img id="qrImage" class="mx-auto border-2 border-slate-100 rounded-lg">
+            <p class="text-slate-500 text-[10px] mt-4 uppercase font-bold tracking-widest">Important: Save this code</p>
+            <button onclick="window.location.reload()" class="mt-4 text-indigo-600 font-bold text-sm">I've scanned it, go to Login</button>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const regForm = document.getElementById('registerForm');
+        const tfaSection = document.getElementById('tfaSection');
+        const qrContainer = document.getElementById('qrContainer');
+        
+        // Tab switching logic
+        document.getElementById('registerTab').onclick = (e) => {
+            e.target.classList.add('bg-indigo-600', 'text-white');
+            e.target.classList.remove('text-gray-400');
+            document.getElementById('loginTab').classList.remove('bg-indigo-600', 'text-white');
+            document.getElementById('loginTab').classList.add('text-gray-400');
+            regForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        };
+
+        document.getElementById('loginTab').onclick = (e) => {
+            e.target.classList.add('bg-indigo-600', 'text-white');
+            e.target.classList.remove('text-gray-400');
+            document.getElementById('registerTab').classList.remove('bg-indigo-600', 'text-white');
+            document.getElementById('registerTab').classList.add('text-gray-400');
+            loginForm.classList.remove('hidden');
+            regForm.classList.add('hidden');
+        };
+
+        // Handle Registration
+        regForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: document.getElementById('regName').value,
+                    email: document.getElementById('regEmail').value,
+                    password: document.getElementById('regPass').value,
+                    role: document.getElementById('regRole').value
+                })
+            });
+            const data = await res.json();
+            if(data.qrCode) {
+                regForm.classList.add('hidden');
+                document.getElementById('registerTab').parentElement.classList.add('hidden');
+                qrContainer.classList.remove('hidden');
+                document.getElementById('qrImage').src = data.qrCode;
+            } else {
+                alert("Registration failed: " + (data.error || "Unknown error"));
+            }
+        };
+
+        // Handle Login Step 1
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    email: document.getElementById('loginEmail').value,
+                    password: document.getElementById('loginPass').value
+                })
+            });
+            if(res.ok) {
+                loginForm.classList.add('hidden');
+                tfaSection.classList.remove('hidden');
+            } else {
+                alert("Invalid credentials. Try again.");
+            }
+        };
+
+        // Handle 2FA Verification
+        document.getElementById('verify2faBtn').onclick = async () => {
+            const res = await fetch('/api/auth/verify-2fa', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    email: document.getElementById('loginEmail').value,
+                    code: document.getElementById('tfaCode').value
+                })
+            });
+            const data = await res.json();
+            if(data.token) {
+                localStorage.setItem('token', data.token);
+                window.location.href = '/dashboard.html';
+            } else {
+                alert("Invalid 2FA code. Please check your app.");
+            }
+        };
+    </script>
+</body>
+</html>
