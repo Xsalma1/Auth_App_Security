@@ -2,56 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | SecureAuth System</title>
+    <title>Security Hub | Control Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-    </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-6">
+<body class="bg-[#0f172a] text-white min-h-screen">
+    <nav class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+        <h2 class="font-bold text-indigo-400 tracking-widest italic">SECURE_AUTH_v1</h2>
+        <button onclick="logout()" class="text-xs bg-red-600/20 text-red-500 px-4 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition">LOGOUT</button>
+    </nav>
 
-    <div class="glass-card p-8 rounded-3xl shadow-2xl w-full max-w-3xl">
-        <div class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
-            <div>
-                <h1 class="text-3xl font-bold text-indigo-400">Main Dashboard</h1>
-                <p class="text-gray-400 text-sm">Status: 2FA Verified ✅</p>
+    <div class="max-w-5xl mx-auto p-10">
+        <header class="mb-12">
+            <h1 class="text-5xl font-black mb-2 tracking-tighter">Welcome Back, <span id="userName" class="text-indigo-500">...</span></h1>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                <p class="text-slate-500 font-mono text-xs uppercase tracking-widest">Active Role: <span id="userRole" class="text-emerald-400">Loading</span></p>
             </div>
-            <button onclick="logout()" class="bg-red-500/20 hover:bg-red-500 text-red-500 hover:text-white px-4 py-2 rounded-lg transition text-sm font-bold">Logout</button>
-        </div>
+        </header>
 
-        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Protected Resources</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-            <a href="/admin.html" class="bg-red-600/10 hover:bg-red-600 border border-red-600/30 p-4 rounded-xl text-center font-bold transition">Admin Page</a>
-            <a href="/manager.html" class="bg-indigo-600/10 hover:bg-indigo-600 border border-indigo-600/30 p-4 rounded-xl text-center font-bold transition">Manager Page</a>
-            <button class="bg-emerald-600/20 border border-emerald-600/40 p-4 rounded-xl text-center font-bold cursor-default text-emerald-400">User Profile</button>
-        </div>
-
-        <div class="mt-8 bg-black/50 p-6 rounded-2xl border border-slate-800">
-            <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-3">Your Session Token (JWT)</h3>
-            <div class="text-[10px] break-all font-mono text-gray-400 leading-relaxed bg-black p-4 rounded-lg" id="tokenBox"></div>
-            <p class="text-[10px] text-gray-600 mt-3 italic font-semibold">Note: This token is required to access the pages above.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div onclick="window.location.href='/admin-role'" class="group bg-slate-800/40 p-8 rounded-3xl border border-red-900/30 hover:border-red-500 transition cursor-pointer">
+                <h3 class="text-xl font-bold text-red-500 mb-2">🛡️ Admin Role Vault</h3>
+                <p class="text-xs text-slate-500">Manage security protocols and system health.</p>
+            </div>
+            <div onclick="window.location.href='/manager-role'" class="group bg-slate-800/40 p-8 rounded-3xl border border-indigo-900/30 hover:border-indigo-500 transition cursor-pointer">
+                <h3 class="text-xl font-bold text-indigo-400">📊 Manager Analytics</h3>
+                <p class="text-xs text-slate-500">Review activity logs and supervisory charts.</p>
+            </div>
+            <div onclick="window.location.href='/user-role'" class="group bg-slate-800/40 p-8 rounded-3xl border border-emerald-900/30 hover:border-emerald-500 transition cursor-pointer">
+                <h3 class="text-xl font-bold text-emerald-400">👤 User General Area</h3>
+                <p class="text-xs text-slate-500">Standard authenticated member resources.</p>
+            </div>
+            <div onclick="window.location.href='/profile'" class="group bg-slate-800/40 p-8 rounded-3xl border border-amber-900/30 hover:border-amber-500 transition cursor-pointer">
+                <h3 class="text-xl font-bold text-amber-500">🆔 My Identity</h3>
+                <p class="text-xs text-slate-500">View your metadata and security token info.</p>
+            </div>
         </div>
     </div>
 
     <script>
         const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = '/';
-        } else {
-            document.getElementById('tokenBox').innerText = token;
-        }
+        if(!token) window.location.href = '/';
+        
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            // قراءة الاسم الحقيقي من الباك-إند
+            document.getElementById('userName').innerText = payload.username || payload.name || "User";
+            document.getElementById('userRole').innerText = payload.role.toUpperCase();
+        } catch(e) { window.location.href = '/'; }
 
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = '/';
-        }
+        function logout() { localStorage.removeItem('token'); window.location.href = '/'; }
     </script>
 </body>
 </html>

@@ -2,40 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel | SecureAuth</title>
+    <title>Admin Vault | SecureAuth</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white flex flex-col items-center justify-center min-h-screen">
-    <div id="content" class="hidden bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-2xl text-center border-2 border-red-500">
-        <h1 class="text-3xl font-bold text-red-500 mb-4">Admin Control Center</h1>
-        <p class="text-gray-300 mb-6">This area is restricted. Only users with the <b>Admin</b> role can see this.</p>
-        <div class="bg-slate-700 p-4 rounded text-left font-mono text-sm">
-            > Access Granted: User Role Verified <br>
-            > System Status: Optimal <br>
-            > Security Protocols: Active
+<body class="bg-[#0f172a] text-white p-8 min-h-screen">
+    <div id="content" class="hidden max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8 border-b border-red-500/30 pb-4">
+            <h1 class="text-3xl font-black text-red-500 tracking-tighter uppercase">🛡️ Root Admin Vault</h1>
+            <button onclick="window.location.href='/dashboard'" class="text-xs bg-slate-800 px-4 py-2 rounded-lg hover:bg-slate-700">Back to Hub</button>
         </div>
-        <button onclick="window.location.href='/dashboard.html'" class="mt-6 text-indigo-400 underline">Back to Dashboard</button>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                <p class="text-xs text-slate-500 uppercase font-bold">Server Load</p>
+                <p class="text-2xl font-mono text-emerald-400">12%</p>
+            </div>
+            <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                <p class="text-xs text-slate-500 uppercase font-bold">Active Sessions</p>
+                <p class="text-2xl font-mono text-indigo-400">1,042</p>
+            </div>
+            <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                <p class="text-xs text-slate-500 uppercase font-bold">Firewall</p>
+                <p class="text-2xl font-mono text-red-500">ENFORCED</p>
+            </div>
+        </div>
+
+        <div class="bg-black p-4 rounded-xl mb-8 border border-slate-800 font-mono text-[11px] text-green-500 h-40 overflow-y-auto shadow-inner">
+            <p>> [SYSTEM] Core security modules initialized...</p>
+            <p class="text-yellow-500">> [WARN] Failed login attempt from IP 104.22.11.9</p>
+            <p>> [INFO] Database encryption: AES-256 ACTIVE</p>
+            <p>> [INFO] Monitoring user traffic in real-time...</p>
+        </div>
+
+        <div class="bg-slate-800/40 rounded-2xl border border-slate-700 overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-700/50">
+                    <tr><th class="p-4">Identity</th><th class="p-4">Access Level</th><th class="p-4">Action</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700">
+                    <tr><td class="p-4">salma_admin</td><td class="p-4 text-red-400">Root</td><td class="p-4 text-xs text-slate-500 italic font-bold text-center">OWNER</td></tr>
+                    <tr><td class="p-4">test_user_01</td><td class="p-4 text-emerald-400">Standard</td><td class="p-4"><button class="bg-red-500/20 text-red-500 px-3 py-1 rounded text-xs hover:bg-red-500 hover:text-white transition">Revoke</button></td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div id="error" class="hidden text-center">
-        <h1 class="text-6xl font-bold text-red-600 mb-4">403</h1>
-        <p class="text-2xl">Access Denied!</p>
-        <p class="text-gray-400">You don't have the permissions to view this page.</p>
-        <button onclick="window.location.href='/dashboard.html'" class="mt-6 bg-indigo-600 p-3 rounded-lg">Return to Dashboard</button>
+    <div id="error" class="hidden text-center mt-20">
+        <h1 class="text-9xl font-black text-red-600/20">403</h1>
+        <p class="text-xl font-bold">ADMIN CLEARANCE REQUIRED</p>
+        <button onclick="window.location.href='/dashboard'" class="mt-6 bg-red-600 px-6 py-2 rounded-xl font-bold">Escape to Dashboard</button>
     </div>
 
     <script>
         async function checkAdmin() {
             const token = localStorage.getItem('token');
-            const res = await fetch('/api/admin', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (res.ok) {
-                document.getElementById('content').classList.remove('hidden');
-            } else {
-                document.getElementById('error').classList.remove('hidden');
-            }
+            const res = await fetch('/api/admin', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (res.ok) document.getElementById('content').classList.remove('hidden');
+            else document.getElementById('error').classList.remove('hidden');
         }
         checkAdmin();
     </script>

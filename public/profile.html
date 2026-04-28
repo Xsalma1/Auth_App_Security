@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Identity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b1120] text-white p-10 min-h-screen flex items-center justify-center">
+    <div class="max-w-2xl w-full bg-slate-900/80 backdrop-blur-xl rounded-[3rem] p-12 border border-slate-800 shadow-2xl relative">
+        <header class="flex items-center gap-6 mb-10 border-b border-slate-800 pb-8">
+            <div id="avatar" class="w-20 h-20 bg-indigo-600 rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-500/20">?</div>
+            <div>
+                <h1 id="pName" class="text-4xl font-black text-indigo-400 italic uppercase">...</h1>
+                <p id="pRole" class="text-xs font-mono text-slate-500 font-bold uppercase"></p>
+            </div>
+        </header>
+
+        <div id="pData" class="grid grid-cols-2 gap-4 mb-8"></div>
+
+        <div class="bg-black/60 p-5 rounded-2xl border border-slate-800">
+            <p class="text-[9px] text-amber-500 font-bold mb-2 uppercase tracking-tighter">// LIVE_JWT_CREDENTIALS</p>
+            <div id="pToken" class="text-[9px] font-mono text-slate-600 break-all max-h-20 overflow-y-auto"></div>
+        </div>
+
+        <button onclick="window.location.href='/dashboard'" class="mt-8 text-slate-500 text-xs font-bold hover:text-white transition uppercase">← Return to Hub</button>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if(!token) window.location.href = '/';
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const realName = payload.username || payload.name || "User";
+        
+        document.getElementById('pName').innerText = realName;
+        document.getElementById('avatar').innerText = realName.charAt(0).toUpperCase();
+        document.getElementById('pRole').innerText = `Auth_Level: ${payload.role.toUpperCase()}`;
+        document.getElementById('pToken').innerText = token;
+
+        const data = [
+            { label: "Internal ID", val: payload.id || "GEN-99" },
+            { label: "Status", val: "Verified_Session" },
+            { label: "Algorithm", val: "HS256" },
+            { label: "Issued_At", val: new Date(payload.iat * 1000).toLocaleTimeString() }
+        ];
+
+        document.getElementById('pData').innerHTML = data.map(d => `
+            <div class="bg-slate-800/20 p-4 rounded-xl border border-slate-700/30">
+                <p class="text-[9px] text-slate-500 font-bold uppercase">${d.label}</p>
+                <p class="text-sm font-mono text-indigo-300">${d.val}</p>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>

@@ -18,7 +18,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // Middleware to check specific Roles
-const authorizeRole = (allowedRoles) => {
+const authorize = (allowedRoles) => {
     return (req, res, next) => {
         if (!allowedRoles.includes(req.user.role)) {
             return res.status(403).json({ message: "Permission Denied: Unauthorized Role" });
@@ -27,4 +27,4 @@ const authorizeRole = (allowedRoles) => {
     };
 };
 
-module.exports = { verifyToken, authorizeRole };
+module.exports = { verifyToken, authorize };
